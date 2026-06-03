@@ -1,0 +1,230 @@
+---
+name: commit-push-deliver
+description: Use when the user asks to start a Runrun.it task (fetch details, create branch, move card), deliver a task (commit to branch, push, post comments on card), or deploy to production (merge branch into master, push, post comment).
+---
+
+# Gerenciar Ciclo de Demanda (Runrun.it)
+
+## Overview
+
+Três modos para o ciclo completo de uma demanda:
+- **INICIAR** — busca contexto, cria branch e move o card
+- **ENTREGAR** — commit na branch, push e comenta no card
+- **SUBIR PARA PRODUÇÃO** — merge na master, push e comenta no card
+
+---
+
+## Modo: INICIAR demanda
+
+**Acionado por:** "inicia a demanda X", "começa a demanda X", "dá uma olhada na demanda X"
+
+### 1. Buscar detalhes da tarefa (paralelo)
+
+```
+tasks_get(id)  +  tasks_get_description(id)
+```
+
+### 2. Apresentar resumo
+
+Exibir: título, cliente, projeto, estágio atual, responsável e descrição limpa (sem HTML).
+
+### 3. Verificar esteira e mover se necessário
+
+Verificar o campo `board_stage_name` retornado pelo `tasks_get`:
+
+- **Já está em "10 - A fazer/fazendo Front"** → pular esta etapa
+- **Está em outra esteira** → mover com `tasks_update_status` usando `board_stage_id: 2195275`
+
+> ⚠️ **Limitação conhecida:** `tasks_update_status` retorna `{}` consistentemente sem efetivar. Sempre avisar o usuário para mover manualmente para **"10 - A fazer/fazendo Front"**.
+
+### 4. Verificar/criar branch
+
+Convenção de nome: `task-{ID}` (ex: `task-68207`)
+
+```bash
+# Verifica se branch remota ou local existe
+git fetch origin
+git branch -a | grep "task-{ID}"
+```
+
+- **Existe localmente:** `git checkout task-{ID}`
+- **Existe no remote:** `git checkout -b task-{ID} origin/task-{ID}`
+- **Não existe:** `git checkout -b task-{ID}`
+
+### 5. Confirmar ao usuário
+
+Informar: branch ativa, esteira atual do card, e resumo do problema a resolver.
+
+---
+
+## Modo: ENTREGAR demanda
+
+**Acionado por:** "entrega a demanda", "commita e entrega", "commita, push e entrega"
+
+### 1. Garantir que está na branch correta
+
+```bash
+git branch --show-current
+# Se não estiver na branch da demanda, fazer checkout
+```
+
+### 2. Identificar arquivos relevantes
+
+```bash
+git status
+git diff
+```
+
+Commitar **apenas** os arquivos da correção — ignorar modificações pré-existentes não relacionadas.
+
+### 3. Commit
+
+```bash
+git add <arquivo(s)>
+git commit -m "$(cat <<'EOF'
+fix(escopo): descrição objetiva do que foi corrigido e por quê
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+EOF
+)"
+```
+
+### 4. Push na branch e capturar hash
+
+```bash
+git push origin task-{ID} && git log -1 --format="%H"
+```
+
+### 5. Montar URL do commit
+
+```bash
+git remote get-url origin
+# git@bitbucket.org:ORG/REPO.git → https://bitbucket.org/ORG/REPO/commits/HASH
+```
+
+### 6. Comentário de entrega no card
+
+```
+Entrega de Demanda
+📋 Resumo da Implementação
+
+<Breve descrição da funcionalidade, correção ou melhoria realizada.>
+
+🐞 Problema Identificado
+
+<Descrição clara do problema ou necessidade que motivou a implementação.>
+
+⚙️ Descrição Técnica
+
+<Detalhamento técnico da solução implementada.>
+
+✅ Solução Aplicada
+
+<O que foi realizado objetivamente para resolver o problema.>
+
+📁 Arquivos Envolvidos
+
+<Lista dos arquivos criados ou alterados, agrupados por Frontend / Backend / Banco de Dados conforme aplicável.>
+
+🧪 Testes Realizados
+
+<Descrição dos testes executados com checkboxes marcados.>
+
+**Branch:** task-{ID}
+**Commit:** https://bitbucket.org/ORG/REPO/commits/HASH
+```
+
+### 7. Verificar esteira e mover se necessário
+
+Verificar o campo `board_stage_name` atual do card via `tasks_get`:
+
+- **Já está em "14 - Teste HM"** → pular esta etapa
+- **Está em outra esteira** → mover com `tasks_update_status` usando `board_stage_id: 2195279`
+
+> ⚠️ **Limitação conhecida:** `tasks_update_status` retorna `{}` consistentemente sem efetivar. Sempre avisar o usuário para mover manualmente para **"14 - Teste HM"**.
+
+---
+
+## Modo: SUBIR PARA PRODUÇÃO
+
+**Acionado por:** "sobe para produção", "mergeia na master", "coloca em produção"
+
+### 1. Confirmar branch atual e atualizar master
+
+```bash
+git checkout master
+git pull origin master
+```
+
+### 2. Merge da branch da demanda
+
+```bash
+git merge task-{ID} --no-ff -m "$(cat <<'EOF'
+Merge task-{ID}: <título resumido da demanda>
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+EOF
+)"
+```
+
+### 3. Push na master e capturar hash
+
+```bash
+git push origin master && git log -1 --format="%H"
+```
+
+### 4. Verificar esteira e mover se necessário
+
+Verificar o campo `board_stage_name` atual do card via `tasks_get`:
+
+- **Já está em "19 - Aviso Entrega"** → pular esta etapa
+- **Está em outra esteira** → mover com `tasks_update_status` usando `board_stage_id: 2195286`
+
+> ⚠️ **Limitação conhecida:** `tasks_update_status` retorna `{}` consistentemente sem efetivar. Sempre avisar o usuário para mover manualmente para **"19 - Aviso Entrega"**.
+
+### 5. Comentário técnico no card
+
+```
+🚀 *Deploy em produção*
+
+**Branch mergeada:** task-{ID} → master
+**Commit:** https://bitbucket.org/ORG/REPO/commits/HASH
+```
+
+### 6. Pausar timer se estiver rodando
+
+Verificar via `tasks_get` se o campo `is_working_on` indica que o usuário atual está com o play ativo na demanda:
+
+- **Timer ativo** → chamar `tasks_pause(id)` para pausar
+- **Timer inativo** → pular esta etapa
+
+---
+
+## Quick Reference
+
+| Etapa | Ferramenta |
+|-------|-----------|
+| Buscar tarefa | `tasks_get` + `tasks_get_description` (paralelo) |
+| Verificar branch | `git fetch origin` + `git branch -a` |
+| Criar/trocar branch | `git checkout -b task-{ID}` |
+| Ver mudanças | `git status` + `git diff` |
+| Commit | `git add <arquivo>` + `git commit` |
+| Push branch | `git push origin task-{ID}` |
+| Merge master | `git checkout master` + `git merge task-{ID} --no-ff` |
+| Push master | `git push origin master` |
+| URL commit | `git remote get-url origin` → HTTPS |
+| Comentários | `tasks_comments_create` (técnico + cliente) |
+| Mover para "10 - A fazer/fazendo Front" | `tasks_update_status` com `board_stage_id: 2195275` |
+| Mover para "14 - Teste HM" | `tasks_update_status` com `board_stage_id: 2195279` |
+| Mover para "19 - Aviso Entrega" | `tasks_update_status` com `board_stage_id: 2195286` |
+| Pausar timer da demanda | `tasks_pause(id)` (apenas se `is_working_on` estiver ativo) |
+
+## Common Mistakes
+
+- **Commitar arquivos não relacionados** — sempre verificar `git diff` antes de `git add`
+- **Push na master direto sem branch** — sempre trabalhar na branch `task-{ID}` até subir para produção
+- **Merge sem `--no-ff`** — usar `--no-ff` para preservar histórico da branch no merge
+- **Esquecer de capturar hash** — `git push && git log -1 --format="%H"` em um comando só
+- **URL errada do commit** — converter `git@bitbucket.org:ORG/REPO.git` → `https://bitbucket.org/ORG/REPO/commits/HASH`
+- **Comentário cliente técnico demais** — linguagem simples, focar no benefício e em como usar
+- **Mover esteira sem verificar ID** — sempre usar `tasks_list` + grep para confirmar o `board_stage_id`
