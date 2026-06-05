@@ -49,7 +49,13 @@ git branch -a | grep "task-{ID}"
 
 - **Existe localmente:** `git checkout task-{ID}`
 - **Existe no remote:** `git checkout -b task-{ID} origin/task-{ID}`
-- **Não existe:** `git checkout -b task-{ID}`
+- **Não existe:** Atualize a branch principal antes de criar a nova:
+  ```bash
+  # Substitua 'master' por 'main' se necessário
+  git checkout master
+  git pull origin master
+  git checkout -b task-{ID}
+  ```
 
 ### 5. Confirmar ao usuário
 
