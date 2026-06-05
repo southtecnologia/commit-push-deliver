@@ -111,33 +111,80 @@ git remote get-url origin
 ### 6. Comentário de entrega no card
 
 ```
-Entrega de Demanda
-📋 Resumo da Implementação
+# Notas Técnicas da Implementação (DEV)
 
-<Breve descrição da funcionalidade, correção ou melhoria realizada.>
+---
 
-🐞 Problema Identificado
+## 1. Resumo da Implementação
 
-<Descrição clara do problema ou necessidade que motivou a implementação.>
+<Breve descrição do que foi implementado/corrigido e qual regra/comportamento foi alterado.>
 
-⚙️ Descrição Técnica
+---
 
-<Detalhamento técnico da solução implementada.>
+## 2. Mudanças Realizadas
 
-✅ Solução Aplicada
+- <Arquivo/serviço/método alterado e o que foi feito>
+- <Arquivo/serviço/método alterado e o que foi feito>
+- <...>
 
-<O que foi realizado objetivamente para resolver o problema.>
+---
 
-📁 Arquivos Envolvidos
+## 3. Detalhamento Técnico
 
-<Lista dos arquivos criados ou alterados, agrupados por Frontend / Backend / Banco de Dados conforme aplicável.>
+### 3.1 Arquivos/Classes Alterados
 
-🧪 Testes Realizados
+- `<caminho/Arquivo.ext>`
+- `<caminho/Arquivo.ext>`
 
-<Descrição dos testes executados com checkboxes marcados.>
+### 3.2 Fluxo Alterado
 
-**Branch:** task-{ID}
-**Commit:** https://bitbucket.org/ORG/REPO/commits/HASH
+**Antes:**
+1. <Passo 1 do fluxo anterior>
+2. <Passo 2 do fluxo anterior>
+
+**Agora:**
+1. <Passo 1 do novo fluxo>
+2. <Passo 2 do novo fluxo>
+
+### 3.3 Justificativa Técnica
+
+<Por que esta abordagem foi escolhida. Decisões de design, trade-offs, padrões seguidos.>
+
+---
+
+## 4. Impactos
+
+- <Impacto 1 no sistema/usuário>
+- <Impacto 2 em integrações ou outros módulos>
+
+---
+
+## 5. Riscos e Considerações
+
+- <Risco ou ponto de atenção 1>
+- <Risco ou ponto de atenção 2>
+
+---
+
+## 6. Instruções para QA
+
+- Testar <cenário 1>: deve <comportamento esperado>.
+- Testar <cenário 2>: deve <comportamento esperado>.
+- <...>
+
+---
+
+## 7. Feature Flags / Configurações
+
+- <Flag criada ou "Nenhuma flag criada.">
+- <Dependência de ambiente ou "Não há dependências de ambiente.">
+
+---
+
+## 8. Referências
+
+- **Branch:** task-{ID}
+- **Commit:** https://bitbucket.org/ORG/REPO/commits/HASH
 ```
 
 ### 7. Verificar esteira e mover se necessário
