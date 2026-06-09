@@ -198,6 +198,61 @@ Verificar o campo `board_stage_name` atual do card via `tasks_get`:
 
 ---
 
+## Modo: SUBIR PARA HOMOLOÇÃO
+
+**Acionado por:** "sobe para homologação", "mergeia na dev", "coloca em homologação", "sobe para hm", "coloca em hm"
+
+### 1. Confirmar branch atual e atualizar dev
+
+```bash
+git checkout dev
+git pull origin dev
+```
+
+### 2. Merge da branch da demanda
+
+```bash
+git merge task-{ID} --no-ff -m "$(cat <<'EOF'
+Merge task-{ID}: <título resumido da demanda>
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+EOF
+)"
+```
+
+### 3. Push na dev e capturar hash
+
+```bash
+git push origin dev && git log -1 --format="%H"
+```
+
+### 4. Verificar esteira e mover se necessário
+
+Verificar o campo `board_stage_name` atual do card via `tasks_get`:
+
+- **Já está em "14 - Teste HM"** → pular esta etapa
+- **Está em outra esteira** → mover com `tasks_update_status` usando `board_stage_id: 2195279`
+
+> ⚠️ **Limitação conhecida:** `tasks_update_status` retorna `{}` consistentemente sem efetivar. Sempre avisar o usuário para mover manualmente para **"14 - Teste HM"**.
+
+### 5. Comentário técnico no card
+
+```
+🚀 *Deploy em homologação*
+
+**Branch mergeada:** task-{ID} → dev
+**Commit:** https://bitbucket.org/ORG/REPO/commits/HASH
+```
+
+### 6. Pausar timer se estiver rodando
+
+Verificar via `tasks_get` se o campo `is_working_on` indica que o usuário atual está com o play ativo na demanda:
+
+- **Timer ativo** → chamar `tasks_pause(id)` para pausar
+- **Timer inativo** → pular esta etapa
+
+---
+
 ## Modo: SUBIR PARA PRODUÇÃO
 
 **Acionado por:** "sobe para produção", "mergeia na master", "coloca em produção"
