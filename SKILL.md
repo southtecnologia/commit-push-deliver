@@ -202,6 +202,8 @@ Verificar o campo `board_stage_name` atual do card via `tasks_get`:
 
 **Acionado por:** "sobe para homologação", "mergeia na dev", "coloca em homologação", "sobe para hm", "coloca em hm"
 
+> **Modelo:** delegar toda a execução deste modo a um sub-agente via ferramenta `Agent` com `model: "claude-haiku-4-5-20251001"`. Passar o número da demanda e os passos abaixo como prompt do agente.
+
 ### 1. Confirmar branch atual e atualizar dev
 
 ```bash
@@ -256,6 +258,8 @@ Verificar via `tasks_get` se o campo `is_working_on` indica que o usuário atual
 ## Modo: SUBIR PARA PRODUÇÃO
 
 **Acionado por:** "sobe para produção", "mergeia na master", "coloca em produção"
+
+> **Modelo:** delegar toda a execução deste modo a um sub-agente via ferramenta `Agent` com `model: "claude-haiku-4-5-20251001"`. Passar o número da demanda e os passos abaixo como prompt do agente.
 
 ### 1. Confirmar branch atual e atualizar master
 
