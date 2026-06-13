@@ -191,10 +191,10 @@ git remote get-url origin
 
 Verificar o campo `board_stage_name` atual do card via `tasks_get`:
 
-- **Já está em "14 - Teste HM"** → pular esta etapa
-- **Está em outra esteira** → mover com `tasks_update_status` usando `board_stage_id: 2195279`
+- **Já está em "11 - Teste HM"** → pular esta etapa
+- **Está em outra esteira** → mover com `tasks_update_status` usando `board_stage_id: 2195276`
 
-> ⚠️ **Limitação conhecida:** `tasks_update_status` retorna `{}` consistentemente sem efetivar. Sempre avisar o usuário para mover manualmente para **"14 - Teste HM"**.
+> ⚠️ **Limitação conhecida:** `tasks_update_status` retorna `{}` consistentemente sem efetivar. Sempre avisar o usuário para mover manualmente para **"11 - Teste HM"**.
 
 ---
 
