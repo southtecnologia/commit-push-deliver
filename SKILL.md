@@ -12,6 +12,10 @@ Três modos para o ciclo completo de uma demanda:
 - **ENTREGAR** — commit na branch, push e comenta no card
 - **SUBIR PARA PRODUÇÃO** — merge na master, push e comenta no card
 
+## Regras
+
+- Só mova o card para "19 - Aviso Entrega" se for através do modo SUBIR PARA PRODUÇÃO.
+
 ---
 
 ## Modo: INICIAR demanda
@@ -31,6 +35,7 @@ Verificar via `tasks_get` se o campo `is_working_on` indica que o usuário atual
 ### 2. Apresentar resumo
 
 Exibir: título, cliente, projeto, estágio atual, responsável e descrição limpa (sem HTML).
+Verificar comentários para apurar se há mais informações relevantes sobre a demanda.
 
 ### 3. Verificar esteira e mover se necessário
 
@@ -199,6 +204,13 @@ Verificar o campo `board_stage_name` atual do card via `tasks_get`:
 - **Está em outra esteira** → mover com `tasks_update_status` usando `board_stage_id: 2195276`
 
 > ⚠️ **Limitação conhecida:** `tasks_update_status` retorna `{}` consistentemente sem efetivar. Sempre avisar o usuário para mover manualmente para **"11 - Teste HM"**.
+
+### 8. Pausar timer se estiver rodando
+
+Verificar via `tasks_get` se o campo `is_working_on` indica que o usuário atual está com o play ativo na demanda:
+
+- **Timer ativo** → chamar `tasks_pause(id)` para pausar
+- **Timer inativo** → pular esta etapa
 
 ---
 
