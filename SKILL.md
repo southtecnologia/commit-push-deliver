@@ -23,6 +23,10 @@ Três modos para o ciclo completo de uma demanda:
 ```
 tasks_get(id)  +  tasks_get_description(id)
 ```
+Verificar via `tasks_get` se o campo `is_working_on` indica que o usuário atual está com o play ativo na demanda:
+
+- **Timer ativo** → pular esta etapa
+- **Timer inativo** → chamar `tasks_play(id)` para iniciar
 
 ### 2. Apresentar resumo
 
