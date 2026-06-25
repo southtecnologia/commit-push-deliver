@@ -66,7 +66,14 @@ git branch -a | grep "task-{ID}"
   git checkout -b task-{ID}
   ```
 
-### 5. Confirmar ao usuário
+### 5. Pausar timer
+
+Verificar via `tasks_get` se o campo `is_working_on` indica que o usuário atual está com o play ativo na demanda:
+
+- **Timer ativo** → chamar `tasks_pause(id)` para pausar
+- **Timer inativo** → pular esta etapa
+
+### 6. Confirmar ao usuário
 
 Informar: branch ativa, esteira atual do card, e resumo do problema a resolver.
 
@@ -198,12 +205,13 @@ git remote get-url origin
 
 ### 7. Verificar esteira e mover se necessário
 
-Verificar o campo `board_stage_name` atual do card via `tasks_get`:
+Verificar o campo `board_stage_name` atual do card via `tasks_get` e mover conforme a esteira:
 
-- **Já está em "11 - Teste HM"** → pular esta etapa
-- **Está em outra esteira** → mover com `tasks_update_status` usando `board_stage_id: 2195276`
+- **Está em "08 - A fazer/Fazendo Back"** → mover com `tasks_update_status` usando `board_stage_id: 2195274` ("09 - Validação Back")
+- **Está em "10 - A fazer/fazendo Front"** → mover com `tasks_update_status` usando `board_stage_id: 2195276` ("11 - Validação Front")
+- **Já está em "09 - Validação Back" ou "11 - Validação Front"** → pular esta etapa
 
-> ⚠️ **Limitação conhecida:** `tasks_update_status` retorna `{}` consistentemente sem efetivar. Sempre avisar o usuário para mover manualmente para **"11 - Teste HM"**.
+> ⚠️ **Limitação conhecida:** `tasks_update_status` retorna `{}` consistentemente sem efetivar. Sempre avisar o usuário para mover manualmente para o estágio correto.
 
 ### 8. Pausar timer se estiver rodando
 
@@ -249,9 +257,10 @@ git push origin dev && git log -1 --format="%H"
 Verificar o campo `board_stage_name` atual do card via `tasks_get`:
 
 - **Já está em "14 - Teste HM"** → pular esta etapa
+- **Está em "09 - Validação Back"** → mover com `tasks_update_status` usando `board_stage_id: 2195275` ("10 - A fazer/fazendo Front")
 - **Está em outra esteira** → mover com `tasks_update_status` usando `board_stage_id: 2195279`
 
-> ⚠️ **Limitação conhecida:** `tasks_update_status` retorna `{}` consistentemente sem efetivar. Sempre avisar o usuário para mover manualmente para **"14 - Teste HM"**.
+> ⚠️ **Limitação conhecida:** `tasks_update_status` retorna `{}` consistentemente sem efetivar. Sempre avisar o usuário para mover manualmente para o estágio correto (**"10 - A fazer/fazendo Front"** ou **"14 - Teste HM"**).
 
 ### 5. Comentário técnico no card
 
@@ -342,7 +351,10 @@ Verificar via `tasks_get` se o campo `is_working_on` indica que o usuário atual
 | Push master | `git push origin master` |
 | URL commit | `git remote get-url origin` → HTTPS |
 | Comentários | `tasks_comments_create` (técnico + cliente) |
+| Mover para "08 - A fazer/Fazendo Back" | `tasks_update_status` com `board_stage_id: 2195273` |
+| Mover para "09 - Validação Back" | `tasks_update_status` com `board_stage_id: 2195274` |
 | Mover para "10 - A fazer/fazendo Front" | `tasks_update_status` com `board_stage_id: 2195275` |
+| Mover para "11 - Validação Front" | `tasks_update_status` com `board_stage_id: 2195276` |
 | Mover para "14 - Teste HM" | `tasks_update_status` com `board_stage_id: 2195279` |
 | Mover para "19 - Aviso Entrega" | `tasks_update_status` com `board_stage_id: 2195286` |
 | Pausar timer da demanda | `tasks_pause(id)` (apenas se `is_working_on` estiver ativo) |
