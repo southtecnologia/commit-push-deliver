@@ -269,6 +269,18 @@ Verificar o campo `board_stage_name` atual do card via `tasks_get`:
 
 **Branch mergeada:** task-{ID} → dev
 **Commit:** https://bitbucket.org/ORG/REPO/commits/HASH
+
+JSON TESTER:
+{
+  "card_id": "RR-4821",
+  "titulo": "Corrigir cálculo de carência na contratação",
+  "contexto_negocio": "...",
+  "arquivos_impactados": [
+    "app/Services/CarenciaService.php",
+    "app/Http/Controllers/ContratacaoController.php"
+  ],
+  "endpoint_relacionado": "POST /contratacao/plano"
+}
 ```
 
 ### 6. Pausar timer se estiver rodando
