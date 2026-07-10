@@ -222,7 +222,7 @@ Verificar via `tasks_get` se o campo `is_working_on` indica que o usuário atual
 
 ---
 
-## Modo: SUBIR PARA HOMOLOÇÃO
+## Modo: SUBIR PARA HOMOLOGAÇÃO
 
 **Acionado por:** "sobe para homologação", "mergeia na dev", "coloca em homologação", "sobe para hm", "coloca em hm"
 
